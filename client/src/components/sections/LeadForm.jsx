@@ -12,6 +12,11 @@ import {
 } from 'react-icons/fa';
 import SectionHeading from '../common/SectionHeading';
 
+const apiBaseUrl = (
+  import.meta.env.VITE_API_BASE_URL ??
+  (import.meta.env.DEV ? 'http://localhost:8000' : '')
+).replace(/\/$/, '');
+
 const LeadForm = () => {
   const [formData, setFormData] = useState({
     name: '',
@@ -30,7 +35,7 @@ const LeadForm = () => {
     setLoading(true);
 
     try {
-      const res = await fetch('https://xyz-backend-ogby.onrender.com/api/leads', {
+      const res = await fetch(`${apiBaseUrl}/api/leads`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
