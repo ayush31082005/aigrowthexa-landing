@@ -8,11 +8,21 @@ const app = express();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const clientDistPath = path.resolve(__dirname, "../../client/dist");
+const allowedOrigins = new Set([
+    "http://localhost:5173",
+    "http://localhost:3000",
+    "https://aigrowthexa-landing.vercel.app"
+]);
 
 const corsOptions = {
-    origin: "*",
-    credentials: true
-}
+    origin(origin, callback) {
+        if (!origin || allowedOrigins.has(origin)) {
+            return callback(null, true);
+        }
+
+        return callback(new Error("Not allowed by CORS"));
+    }
+};
 
 app.use(express.json());
 app.use(cors(corsOptions));
