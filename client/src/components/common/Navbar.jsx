@@ -18,6 +18,19 @@ export const SECTIONS = [
   { id: "cpr", label: "Comparison" },
 ];
 
+const getSectionUrl = (id) => `/#${id}`;
+
+const getCurrentSectionId = () => {
+  const hashId = window.location.hash.replace(/^#/, "");
+  if (hashId) return hashId;
+
+  const pathId = window.location.pathname.replace(/^\/+/, "");
+  return pathId || "hme";
+};
+
+const updateSectionUrl = (id, method) => {
+  window.history[method](null, "", getSectionUrl(id));
+};
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -51,7 +64,7 @@ const Navbar = () => {
           scrollPosition >= offsetTop &&
           scrollPosition < offsetTop + offsetHeight
         ) {
-          window.history.replaceState(null, "", `/${id}`);
+          updateSectionUrl(id, "replaceState");
         }
       });
     };
@@ -74,7 +87,7 @@ const Navbar = () => {
 
     const offsetPosition = elementPosition - navbarHeight;
 
-    window.history.pushState(null, "", `/${id}`);
+    updateSectionUrl(id, "pushState");
 
     window.scrollTo({
       top: offsetPosition,
@@ -86,10 +99,14 @@ const Navbar = () => {
 
   // Direct open scroll
   useEffect(() => {
-    const path = window.location.pathname.replace("/", "") || "hme";
+    const targetSection = getCurrentSectionId();
+
+    if (SECTIONS.some((section) => section.id === targetSection)) {
+      updateSectionUrl(targetSection, "replaceState");
+    }
 
     setTimeout(() => {
-      const element = document.getElementById(path);
+      const element = document.getElementById(targetSection);
       if (!element) return;
 
       const navbarHeight = navRef.current?.offsetHeight || 80;
@@ -131,7 +148,7 @@ const Navbar = () => {
         <div className="container mx-auto px-4 md:px-6 lg:px-8 flex justify-between items-center">
 
           {/* Logo */}
-          <a href="/hme" onClick={(e) => scrollToSection(e, "hme")}>
+          <a href="/#hme" onClick={(e) => scrollToSection(e, "hme")}>
             <img
               src="/images/icons/logo.png"
               alt="AlGrowthexa"
@@ -146,7 +163,7 @@ const Navbar = () => {
               return (
                 <a
                   key={id}
-                  href={`/${id}`}
+                  href={getSectionUrl(id)}
                   onClick={(e) => scrollToSection(e, id)}
                   className={`px-4 py-2 rounded-lg font-medium text-sm transition-colors ${
                     scrolled
@@ -174,7 +191,7 @@ const Navbar = () => {
             </a>
 
             <a
-              href="/cns"
+              href="/#cns"
               onClick={(e) => scrollToSection(e, "cns")}
               className={`px-5 py-2.5 rounded-full font-semibold text-sm transition-colors shadow-md flex items-center gap-2 ${
                 scrolled
@@ -222,7 +239,7 @@ const Navbar = () => {
                 return (
                   <a
                     key={id}
-                    href={`/${id}`}
+                    href={getSectionUrl(id)}
                     onClick={(e) => scrollToSection(e, id)}
                     className="block text-white/90 hover:text-white text-lg"
                   >
